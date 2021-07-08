@@ -1,29 +1,21 @@
 extern crate histogram;
 extern crate rand;
 
-use cosmwasm_bignumber::Uint256;
 use histogram::Histogram;
-use rand::Rng;
 use std::convert::TryFrom;
-use std::io;
 
-use uniform_rand::{rn_gen, rn_gen_blake, rn_gen_blake3};
+use uniform_rand::{my_blake2b_hash, my_blake2s_hash, my_blake3_hash, my_sha3_hash, rounding_algo};
 
-const HEIGHT: u128 = 4775448;
 const TIME: u128 = 1625636850;
 
-//const UPPER: Uint256 = Uint256::from(100u64);
-const UPPER: u128 = 100;
-
 fn main() {
-
     let mut hist = Histogram::new();
     let mut number = TIME;
     let upper = 100u128;
     for _ in 0..10000 {
         number += 1;
-        let hash = rn_gen_blake3(number, upper);
-        hist.increment(u64::try_from(hash).unwrap());
+        let hash = rounding_algo(number, upper, my_sha3_hash);
+        hist.increment(u64::try_from(hash).unwrap()).unwrap();
         //println!("{}", hash)
     }
 
@@ -46,5 +38,3 @@ fn main() {
         hist.stddev().unwrap(),
     );
 }
-
-
